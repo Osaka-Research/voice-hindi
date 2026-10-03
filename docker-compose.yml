@@ -1,0 +1,33 @@
+services:
+  whisper:
+    build:
+      context: .
+      dockerfile: Dockerfile.whisper
+    restart: unless-stopped
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    # Not published to the host — only api-server talks to it, over the compose network.
+    expose:
+      - "8080"
+
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile.api
+    restart: unless-stopped
+    depends_on:
+      - whisper
+    environment:
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
+      - WHISPER_SERVER_URL=http://whisper:8080/inference
+      - PORT=8082
+      - DATA_DIR=/app/data
+    ports:
+      - "8082:8082"
+    volumes:
+      - ./data:/app/data

@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <rect width="512" height="512" rx="96" fill="#0f1115"/>
+  <circle cx="256" cy="256" r="200" fill="#d64545"/>
+
+  <!-- shopkeeper -->
+  <rect x="176" y="280" width="160" height="140" rx="24" fill="#ffffff"/>
+  <rect x="196" y="300" width="120" height="16" fill="#d64545"/>
+  <circle cx="256" cy="196" r="66" fill="#e8b98a"/>
+  <path d="M190 176 a66 66 0 0 1 132 0 v-6 a66 40 0 0 0 -132 0 z" fill="#2a2018"/>
+
+  <!-- receipt in hand -->
+  <rect x="316" y="320" width="46" height="66" rx="4" fill="#f4f0e8" stroke="#0f1115" stroke-width="4"/>
+  <line x1="324" y1="336" x2="354" y2="336" stroke="#0f1115" stroke-width="4"/>
+  <line x1="324" y1="350" x2="354" y2="350" stroke="#0f1115" stroke-width="4"/>
+  <line x1="324" y1="364" x2="346" y2="364" stroke="#0f1115" stroke-width="4"/>
+</svg>

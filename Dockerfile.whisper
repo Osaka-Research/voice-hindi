@@ -1,0 +1,37 @@
+# GPU-enabled whisper-server for the transcription backend.
+# Build on a CUDA-capable host (this can't be built/tested on this Termux/ARM machine —
+# there's no GPU here to compile or run against). Build on the target EC2 instance itself,
+# or any machine with an NVIDIA GPU + Docker + nvidia-container-toolkit.
+
+FROM nvidia/cuda:12.4.1-devel-ubuntu22.04 AS build
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential cmake git ca-certificates \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /src
+# Pin a specific commit/tag in production for reproducible builds instead of floating master.
+RUN git clone --depth 1 https://github.com/ggml-org/whisper.cpp.git .
+
+RUN cmake -B build -DGGML_CUDA=ON -DCMAKE_BUILD_TYPE=Release \
+    && cmake --build build --target whisper-server whisper-cli -j"$(nproc)"
+
+RUN bash ./models/download-ggml-model.sh small
+
+FROM nvidia/cuda:12.4.1-runtime-ubuntu22.04
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    ffmpeg ca-certificates \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /app
+COPY --from=build /src/build/bin/whisper-server /app/whisper-server
+COPY --from=build /src/build/bin/*.so* /app/
+COPY --from=build /src/models/ggml-small.bin /app/models/ggml-small.bin
+
+ENV LD_LIBRARY_PATH=/app
+
+EXPOSE 8080
+# --no-gpu is omitted deliberately — GPU is used by default when GGML_CUDA build succeeds.
+CMD ["/app/whisper-server", "-m", "/app/models/ggml-small.bin", "-l", "hi", "--convert", \
+     "--host", "0.0.0.0", "--port", "8080"]

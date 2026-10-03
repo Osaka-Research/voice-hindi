@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="hi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#0f1115">
+<link rel="manifest" href="/manifest.json">
+<link rel="icon" href="/icon.svg?v=2">
+<title>Voice Billing</title>
+<style>
+  :root { color-scheme: light dark; }
+  * { box-sizing: border-box; }
+  body {
+    font-family: system-ui, -apple-system, "Noto Sans Devanagari", sans-serif;
+    max-width: 720px; margin: 0 auto; padding: 20px 16px 120px;
+    background: #0f1115; color: #e8e8e8;
+  }
+  h1 { font-size: 1.2rem; margin: 0 0 4px; }
+  #status { color: #9aa0a6; font-size: .85rem; margin-bottom: 16px; }
+  #transcript {
+    color: #6b7078; font-size: .85rem; margin-top: 18px; white-space: pre-wrap; line-height: 1.5;
+    border: 1px dashed transparent; border-radius: 6px; padding: 4px 6px; margin-left: -6px;
+  }
+  #transcript:focus { outline: none; border-color: #444; color: #e8e8e8; background: #1a1d24; }
+  #modelRow { display: flex; align-items: center; gap: 8px; font-size: .8rem; color: #9aa0a6; margin-top: 8px; }
+  #modelRow select { background: #1a1d24; color: #e8e8e8; border: 1px solid #333; border-radius: 6px; padding: 4px 8px; font-size: .8rem; }
+  .model-badge {
+    display: inline-block; margin-left: 6px; padding: 1px 6px; border-radius: 8px;
+    font-size: .65rem; color: #9aa0a6; background: #22262e; vertical-align: middle;
+  }
+
+  table { width: 100%; border-collapse: collapse; margin-top: 8px; }
+  th, td { text-align: left; padding: 8px 10px; border-bottom: 1px solid #2a2d34; }
+  th { color: #9aa0a6; font-weight: 600; font-size: .8rem; }
+  tfoot td { font-weight: 700; border-top: 2px solid #444; border-bottom: none; }
+  td input {
+    width: 100%; background: transparent; color: #e8e8e8;
+    border: 1px solid transparent; border-radius: 4px; padding: 4px 6px; font-size: 1rem; font-family: inherit;
+  }
+  td input:focus { border-color: #d64545; outline: none; background: #22262e; }
+  td input[type="number"] { width: 64px; }
+  .qty-cell { display: flex; align-items: center; gap: 4px; }
+  .qty-cell input.f-qty { width: 40px; text-align: center; }
+  .qty-btn {
+    width: 26px; height: 26px; flex: none; border-radius: 6px; border: 1px solid #333;
+    background: #22262e; color: #e8e8e8; font-size: 1rem; line-height: 1; cursor: pointer; padding: 0;
+  }
+  .qty-btn:active { background: #333; }
+  .rm-row { background: none; border: none; color: #9aa0a6; font-size: 1rem; padding: 2px 8px; cursor: pointer; }
+  .rm-row:hover { color: #d64545; }
+  #addRow { background: #333; color: #e8e8e8; border: none; margin-top: 10px; font-size: .85rem; padding: 8px 16px; border-radius: 8px; cursor: pointer; }
+  #placeholder { color: #6b7078; padding: 24px 0; text-align: center; }
+
+  #recBtn {
+    position: fixed; right: 22px; bottom: 22px; width: 68px; height: 68px; border-radius: 50%;
+    background: #d64545; border: none; color: white; font-size: 1.6rem;
+    box-shadow: 0 4px 16px rgba(0,0,0,.4); cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+  }
+  #recBtn.recording { background: #444; animation: pulse 1.2s infinite; }
+  #recBtn:disabled { opacity: .5; }
+  @keyframes pulse { 0%,100% { box-shadow: 0 4px 16px rgba(214,69,69,.6); } 50% { box-shadow: 0 4px 24px rgba(214,69,69,.9); } }
+
+  #clearBtn {
+    position: fixed; right: 30px; bottom: 100px; width: 46px; height: 46px; border-radius: 50%;
+    background: #2a2d34; border: none; color: #e8e8e8; font-size: 1.1rem;
+    box-shadow: 0 4px 12px rgba(0,0,0,.4); cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+  }
+  #clearBtn:disabled { opacity: .35; cursor: not-allowed; }
+
+  #printBtn {
+    position: fixed; right: 30px; bottom: 156px; width: 46px; height: 46px; border-radius: 50%;
+    background: #2a2d34; border: none; color: #e8e8e8; font-size: 1.1rem;
+    box-shadow: 0 4px 12px rgba(0,0,0,.4); cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+  }
+  #printBtn:disabled { opacity: .35; cursor: not-allowed; }
+
+  #speakBtn {
+    position: fixed; right: 30px; bottom: 212px; width: 46px; height: 46px; border-radius: 50%;
+    background: #2a2d34; border: none; color: #e8e8e8; font-size: 1.1rem;
+    box-shadow: 0 4px 12px rgba(0,0,0,.4); cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+  }
+  #speakBtn:disabled { opacity: .35; cursor: not-allowed; }
+  #speakBtn.speaking { background: #444; animation: pulse 1.2s infinite; }
+
+  #topBar { display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-bottom: 10px; }
+  #installBtn {
+    display: none; align-items: center; gap: 6px; background: #2e7d32; color: white; border: none;
+    border-radius: 20px; padding: 6px 14px; font-size: .8rem; cursor: pointer;
+  }
+  #installBtn:disabled { opacity: .5; cursor: not-allowed; }
+  #shareBtn {
+    display: flex; align-items: center; gap: 6px; background: #2a2d34; color: #e8e8e8; border: none;
+    border-radius: 20px; padding: 6px 14px; font-size: .8rem; cursor: pointer; margin-left: auto;
+  }
+  #shareBtn:disabled { opacity: .4; cursor: not-allowed; }
+</style>
+</head>
+<body>
+  <div id="topBar">
+    <button id="installBtn">📲 Install App</button>
+    <button id="shareBtn">🔗 Share (0/10)</button>
+  </div>
+  <div style="margin-bottom:10px"><a href="/compare.html" style="color:#9aa0a6;font-size:.8rem">🔬 Compare models &rarr;</a></div>
+  <h1>Voice Billing</h1>
+  <div id="status">Tap the button to record.</div>
+
+  <div id="billArea"><div id="placeholder">Bill will appear here after recording.</div></div>
+  <div id="transcript" contenteditable="true" spellcheck="false"></div>
+  <label id="modelRow">
+    Model:
+    <select id="modelSel">
+      <option value="gemini-flash-lite-latest" selected>Gemini Flash-Lite</option>
+      <option value="gemma-4-26b-a4b-it">Gemma 4 26B-A4B</option>
+    </select>
+  </label>
+
+  <button id="speakBtn" disabled title="Read bill aloud">🔊</button>
+  <button id="printBtn" disabled title="Print receipt">🖨️</button>
+  <button id="clearBtn" disabled title="Clear bill">🗑️</button>
+  <button id="recBtn">🎙️</button>
+
+<script src="/app.js?v=15"></script>
+</body>
+</html>

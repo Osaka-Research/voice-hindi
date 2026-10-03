@@ -1,0 +1,5 @@
+{"type":"transcript","raw":"","corrected":"fdf","at":"2026-08-14T16:34:42.824Z"}
+{"type":"transcript","raw":"","corrected":"c","at":"2026-08-14T16:36:58.008Z"}
+{"type":"transcript","raw":"","corrected":"rxx","at":"2026-08-14T16:37:13.093Z"}
+{"type":"billing","text":"10 की मैगी 50 केस खानदे 4 लिस की कैप","corrected":[{"product":"maggi","qty":1,"price":10},{"product":"kanda","qty":2,"price":50},{"product":"cap","qty":1,"price":4}],"at":"2026-08-14T16:38:13.811Z"}
+{"type":"billing","text":"वास्की माखी 20 का सामबर 40 के कानदे","corrected":[{"product":"maggi","qty":1,"price":10},{"product":"samber","qty":1,"price":20},{"product":"kanda","qty":1,"price":40}],"at":"2026-08-14T17:00:23.444Z"}

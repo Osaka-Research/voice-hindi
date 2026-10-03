@@ -1,0 +1,13 @@
+# Lightweight Node service for the public API (api-server.js) + internal relay (relay.js).
+# No GPU needed here — this just talks to whisper-server over the network and calls Gemini.
+
+FROM node:20-slim
+
+WORKDIR /app
+COPY pipeline.js keystore.js api-server.js relay.js manage-keys.js ./
+
+# No package.json / npm dependencies — everything here uses only Node built-ins
+# (http, fs, crypto) plus global fetch. Nothing to `npm install`.
+
+EXPOSE 8082
+CMD ["node", "api-server.js"]

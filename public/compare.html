@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="hi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#0f1115">
+<link rel="icon" href="/icon.svg?v=2">
+<title>Model Compare</title>
+<style>
+  :root { color-scheme: light dark; }
+  * { box-sizing: border-box; }
+  body {
+    font-family: system-ui, -apple-system, "Noto Sans Devanagari", sans-serif;
+    max-width: 720px; margin: 0 auto; padding: 20px 16px 140px;
+    background: #0f1115; color: #e8e8e8;
+  }
+  a { color: #9aa0a6; }
+  h1 { font-size: 1.2rem; margin: 0 0 4px; }
+  #back { display: inline-block; font-size: .8rem; color: #9aa0a6; text-decoration: none; margin-bottom: 10px; }
+  #status { color: #9aa0a6; font-size: .85rem; margin-bottom: 16px; }
+  #status.busy { color: #e0a030; }
+
+  .card {
+    background: #171a20; border: 1px solid #2a2d34; border-radius: 10px;
+    padding: 14px 16px; margin-bottom: 12px;
+  }
+  .card-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+  .tag {
+    display: inline-block; padding: 3px 10px; border-radius: 12px; font-size: .75rem;
+    font-weight: 600; background: #22262e; color: #e8e8e8; letter-spacing: .02em;
+  }
+  .tag.base { background: #1e3a2e; color: #6fcf97; }
+  .tag.base-en { background: #3a2e1e; color: #e0a030; }
+  .tag.small { background: #1e2c3a; color: #56ccf2; }
+  .tag.openai { background: #2e1e3a; color: #bb86fc; }
+  .lang { font-size: .7rem; color: #6b7078; margin-left: 6px; }
+
+  .timing { font-size: .75rem; padding: 2px 8px; border-radius: 8px; font-weight: 600; margin-left: 6px; }
+  .timing.fast { background: #1e3a2e; color: #6fcf97; }
+  .timing.mid { background: #3a2e1e; color: #e0a030; }
+  .timing.slow { background: #3a1e1e; color: #eb5757; }
+  .timing.pending { background: #22262e; color: #6b7078; }
+  .cost { font-size: .7rem; color: #6b7078; margin-left: 6px; }
+
+  .transcript { font-size: 1.05rem; line-height: 1.5; min-height: 1.4em; word-break: break-word; }
+  .transcript.empty { color: #6b7078; font-style: italic; }
+  .transcript.err { color: #eb5757; font-size: .85rem; }
+
+  #keyBox {
+    background: #171a20; border: 1px solid #2a2d34; border-radius: 10px;
+    padding: 12px 14px; margin-bottom: 16px; font-size: .8rem;
+  }
+  #keyBox .label { color: #9aa0a6; margin-bottom: 6px; }
+  #keyRow { display: flex; gap: 6px; }
+  #keyInput {
+    flex: 1; background: #1a1d24; color: #e8e8e8; border: 1px solid #333;
+    border-radius: 6px; padding: 7px 9px; font-size: .85rem; min-width: 0;
+  }
+  #keyBox button {
+    background: #2a2d34; color: #e8e8e8; border: none; border-radius: 6px;
+    padding: 7px 12px; font-size: .8rem; cursor: pointer;
+  }
+  #keyBox .note { color: #6b7078; font-size: .7rem; margin-top: 6px; }
+  #keyStatus { color: #6fcf97; font-size: .75rem; }
+
+  #recBtn {
+    position: fixed; right: 22px; bottom: 22px; width: 68px; height: 68px; border-radius: 50%;
+    background: #d64545; border: none; color: white; font-size: 1.6rem;
+    box-shadow: 0 4px 16px rgba(0,0,0,.4); cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+  }
+  #recBtn.recording { background: #444; animation: pulse 1.2s infinite; }
+  #recBtn:disabled { opacity: .5; }
+  @keyframes pulse { 0%,100% { box-shadow: 0 4px 16px rgba(214,69,69,.6); } 50% { box-shadow: 0 4px 24px rgba(214,69,69,.9); } }
+
+  #placeholder { color: #6b7078; padding: 24px 0; text-align: center; }
+  #spinner { display: none; text-align: center; padding: 24px 0; color: #9aa0a6; font-size: .9rem; }
+  #spinner.on { display: block; }
+</style>
+</head>
+<body>
+  <a id="back" href="/">&larr; Back to billing</a>
+  <h1>Model Compare</h1>
+
+  <div id="keyBox">
+    <div class="label">Bring your own API key &mdash; adds a live OpenAI Whisper card, compared against the local models above. Key stays in this browser tab only (sessionStorage) &mdash; never sent to our server, goes straight to OpenAI.</div>
+    <div id="keyRow">
+      <input id="keyInput" type="password" placeholder="sk-...">
+      <button id="keySave">Save</button>
+      <button id="keyClear">Clear</button>
+    </div>
+    <div id="keyStatus"></div>
+    <div class="note">Uses OpenAI's whisper-1 endpoint ($0.006/min) &mdash; called directly from your browser.</div>
+  </div>
+
+  <div id="status">Tap the button, speak one phrase, release.</div>
+
+  <div id="results">
+    <div id="placeholder">Record a phrase to compare base / base.en / small.</div>
+  </div>
+  <div id="spinner">Running local models&hellip; (small model can take 10-20s on this device)</div>
+
+  <button id="recBtn">🎙️</button>
+
+<script src="/compare.js?v=1"></script>
+</body>
+</html>
